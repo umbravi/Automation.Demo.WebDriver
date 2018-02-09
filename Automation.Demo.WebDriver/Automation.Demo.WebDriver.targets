@@ -1,0 +1,27 @@
+<Project>
+  <Target Name="CopyChromedriverToBin" BeforeTargets="AfterBuild">
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)..\drivers\chromedriver.exe" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"></Copy>
+  </Target>
+  <Target Name="CopyGeckodriverToBin" BeforeTargets="AfterBuild">
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)..\drivers\geckodriver.exe" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"></Copy>
+  </Target>
+  <Target Name="CopyIEDriverServerToBin" BeforeTargets="AfterBuild">
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)..\drivers\IEDriverServer.exe" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"></Copy>
+  </Target>
+  <Target Name="CopyMicrosoftWebDriverToBin" BeforeTargets="AfterBuild">
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)..\drivers\MicrosoftWebDriver.exe" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"></Copy>
+  </Target>
+
+  <Target Name="DeleteChromedriverFromBin" BeforeTargets="AfterClean">
+    <Delete Files="$(OutDir)/chromedriver.exe"></Delete>
+  </Target>
+  <Target Name="DeleteGeckodriverFromBin" BeforeTargets="AfterClean">
+    <Delete Files="$(OutDir)/geckodriver.exe"></Delete>
+  </Target>
+  <Target Name="DeleteIEDriverServerFromBin" BeforeTargets="AfterClean">
+    <Delete Files="$(OutDir)/IEDriverServer.exe"></Delete>
+  </Target>
+  <Target Name="DeleteMicrosoftWebDriverFromBin" BeforeTargets="AfterClean">
+    <Delete Files="$(OutDir)/MicrosoftWebDriver.exe"></Delete>
+  </Target>
+</Project>

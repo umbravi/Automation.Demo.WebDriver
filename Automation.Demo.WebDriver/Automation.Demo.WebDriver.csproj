@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Fluent WebDriver wrapper. Accomodates any WebDriver built with the WebDriver standard.</Description>
+    <Product />
+    <Authors>Michael Weatherford</Authors>
+    <Company></Company>
+    <Version>1.0.0</Version>
+    <PackageLicenseUrl></PackageLicenseUrl>
+    <Copyright>2017</Copyright>
+    <PackageIconUrl></PackageIconUrl>
+    <RepositoryUrl></RepositoryUrl>
+    <PackageTags>WebDriver Selenium Test UI EndToEnd Fluent</PackageTags>
+    <ApplicationIcon />
+    <Win32Resource></Win32Resource>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Selenium.Support" Version="3.7.0" />
+    <PackageReference Include="Selenium.WebDriver" Version="3.7.0" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="2.33.0" />
+    <PackageReference Include="Selenium.WebDriver.GeckoDriver" Version="0.19.1" />
+    <PackageReference Include="Selenium.WebDriver.IEDriver" Version="3.7.0" />
+    <PackageReference Include="Selenium.WebDriver.MicrosoftWebDriver" Version="10.0.16299" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Automation.Demo.WebDriver.targets">
+      <PackagePath>build\</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Include="$(OutDir)/chromedriver.exe">
+      <PackagePath>drivers\</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Include="$(OutDir)/geckodriver.exe">
+      <PackagePath>drivers\</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Include="$(OutDir)/IEDriverServer.exe">
+      <PackagePath>drivers\</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Include="$(OutDir)/MicrosoftWebDriver.exe">
+      <PackagePath>drivers\</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+</Project>

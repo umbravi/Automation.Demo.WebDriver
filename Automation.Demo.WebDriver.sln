@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Automation.Demo.WebDriver", "Automation.Demo.WebDriver\Automation.Demo.WebDriver.csproj", "{D20E90DC-3C79-4FE8-8E28-0CE110AFA303}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Automation.Demo.WebDriver.Tests", "Automation.Demo.WebDriver.Tests\Automation.Demo.WebDriver.Tests.csproj", "{F888794F-7BCE-4B31-BAD0-CBDB6C194897}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{114D9BD2-B740-4A7A-BBC3-48B4402E274B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{70BE598F-6BC7-4FD2-A1CE-7071A41DE9F1}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D20E90DC-3C79-4FE8-8E28-0CE110AFA303}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D20E90DC-3C79-4FE8-8E28-0CE110AFA303}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D20E90DC-3C79-4FE8-8E28-0CE110AFA303}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D20E90DC-3C79-4FE8-8E28-0CE110AFA303}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F888794F-7BCE-4B31-BAD0-CBDB6C194897}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F888794F-7BCE-4B31-BAD0-CBDB6C194897}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F888794F-7BCE-4B31-BAD0-CBDB6C194897}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F888794F-7BCE-4B31-BAD0-CBDB6C194897}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D20E90DC-3C79-4FE8-8E28-0CE110AFA303} = {114D9BD2-B740-4A7A-BBC3-48B4402E274B}
+		{F888794F-7BCE-4B31-BAD0-CBDB6C194897} = {114D9BD2-B740-4A7A-BBC3-48B4402E274B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {826A6632-DD0E-496F-9FCA-FD2DF663B267}
+	EndGlobalSection
+EndGlobal
