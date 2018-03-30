@@ -41,7 +41,7 @@ namespace Automation.Demo.WebDriver.Interaction
             var methodInfo = action.Method.ReturnType.BaseType != null ? GetDelegateInformation(action) : GetDelegateInformation(action.Target.GetType().GetFields()[0].GetValue(action.Target) as Delegate);
             var reportMessage = $"\"{methodInfo.name}\" had parameters \"{methodInfo.parametersList}\"";
 
-            for (var attempt = 1; attempt < maxAttemptCount; attempt++)
+            for (var attempt = 1; attempt <= maxAttemptCount; attempt++)
             {
                 try
                 {
