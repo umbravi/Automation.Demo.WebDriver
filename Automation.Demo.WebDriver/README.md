@@ -79,4 +79,3 @@ public void ValidateElementHasText(By by, string text)
 ```
 <br />
 
-#### PedanticReporting

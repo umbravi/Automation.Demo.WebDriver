@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using Automation.Demo.WebDriver.Interaction.Interfaces;
 using Automation.Demo.WebDriver.Utilities.Interfaces;
 
@@ -15,38 +16,49 @@ namespace Automation.Demo.WebDriver.Interaction
             this.Reporting = reporting;
         }
 
-        public void Do(Action singleAnonymousDelegate)
+        public void Do(
+            Action action, 
+            TimeSpan? retryInterval = null, 
+            int maxAttemptCount = 2)
         {
-            var methodInfo = GetDelegateInformation(singleAnonymousDelegate);
-            var reportMessage = $"\"{methodInfo.name}\" had parameters \"{methodInfo.parametersList}\"";
-
-            try
-            {
-                singleAnonymousDelegate();
-                Reporting.ReportSuccess(reportMessage);
-            }
-            catch (Exception e)
-            {
-                Reporting.ReportFailure(reportMessage, e);
-            }
+            // Encapsulate action delegate within a Func delegate with null return type
+            DoWithResult<object>(() =>
+                {
+                    action();
+                    return null;
+                }, retryInterval ?? TimeSpan.FromSeconds(1), maxAttemptCount
+            );
         }
 
-        public TResult DoWithResult<TResult>(Func<TResult> singleAnonymousDelegate)
+        public T DoWithResult<T>(
+            Func<T> action,
+            TimeSpan? retryInterval = null,
+            int maxAttemptCount = 2)
         {
-            var methodInfo = GetDelegateInformation(singleAnonymousDelegate);
+            retryInterval = retryInterval ?? TimeSpan.FromSeconds(1);
+            
+            // If action is from Do() then get methodInfo from the encapsulated delegate
+            var methodInfo = action.Method.ReturnType.BaseType != null ? GetDelegateInformation(action) : GetDelegateInformation(action.Target.GetType().GetFields()[0].GetValue(action.Target) as Delegate);
             var reportMessage = $"\"{methodInfo.name}\" had parameters \"{methodInfo.parametersList}\"";
 
-            try
+            for (var attempt = 1; attempt < maxAttemptCount; attempt++)
             {
-                TResult result = singleAnonymousDelegate();
-                Reporting.ReportSuccess(reportMessage);
-                return result;
+                try
+                {
+                    if (attempt > 1)
+                    {
+                        Thread.Sleep((TimeSpan)retryInterval);
+                    }
+                    var result = action();
+                    Reporting.ReportSuccess(reportMessage);
+                    return result;
+                }
+                catch (Exception e)
+                {
+                    Reporting.ReportFailure(reportMessage + $" Attempt: {attempt}", e);
+                }
             }
-            catch (Exception e)
-            {
-                Reporting.ReportFailure(reportMessage, e);
-                return (dynamic)string.Empty;
-            }
+            return default(T);
         }
 
         private static (string name, string parametersList) GetDelegateInformation(Delegate singleAnonymousDelegate)
