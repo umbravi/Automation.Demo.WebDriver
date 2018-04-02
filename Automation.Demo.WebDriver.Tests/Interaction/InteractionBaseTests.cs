@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using Automation.Demo.WebDriver.Interaction;
 using Automation.Demo.WebDriver.Utilities;
@@ -85,5 +86,57 @@ namespace Automation.Demo.WebDriver.Tests.Interaction
             reporting.Exceptions.Count.Should().Be(2);
         }
 
+        [TestMethod]
+        public void Do_Invokes_DoWithResult()
+        {
+            var numA = 1;
+            var numB = 2;
+            var fakeAdd = A.Fake<TestFunctions>();
+            
+            A.CallTo(() => fakeAdd.Add(numA, numB)).Throws<Exception>().Twice();
+
+            interactionsBase.Do(() => fakeAdd.Add(numA, numB));
+
+            A.CallTo(() => fakeAdd.Add(numA, numB)).MustHaveHappened(Repeated.Exactly.Twice);
+            reporting.Exceptions.Count.Should().Be(2);
+        }
+
+        [TestMethod]
+        public void Method_Info_From_Do_To_DoWithResult_Is_Preserved()
+        {
+            var numA = 1;
+            var numB = 2;
+            var fakeAdd = A.Fake<TestFunctions>();
+            var myStepList = new List<string>
+            {
+                "Step 1 - Failure: \"Method_Info_From_Do_To_DoWithResult_Is_Preserved\" had parameters \"fakeAdd: Faked Automation.Demo.WebDriver.Tests.Interaction.TestFunctions, numA: 1, numB: 2\" Attempt: 1 ; Exception of type 'System.Exception' was thrown.",
+                "Step 2 - Failure: \"Method_Info_From_Do_To_DoWithResult_Is_Preserved\" had parameters \"fakeAdd: Faked Automation.Demo.WebDriver.Tests.Interaction.TestFunctions, numA: 1, numB: 2\" Attempt: 2 ; Exception of type 'System.Exception' was thrown."
+            };
+
+            A.CallTo(() => fakeAdd.Add(numA, numB)).Throws<Exception>().Twice();
+
+            interactionsBase.Do(() => fakeAdd.Add(numA, numB));
+
+            reporting.Steps.Should().BeEquivalentTo(myStepList);
+        }
+
+        [TestMethod]
+        public void Method_Info_From_DoWithResult_Is_Correct()
+        {
+            var numA = 1;
+            var numB = 2;
+            var fakeAdd = A.Fake<TestFunctions>();
+            var myStepList = new List<string>
+            {
+                "Step 1 - Failure: \"Method_Info_From_DoWithResult_Is_Correct\" had parameters \"fakeAdd: Faked Automation.Demo.WebDriver.Tests.Interaction.TestFunctions, numA: 1, numB: 2\" Attempt: 1 ; Exception of type 'System.Exception' was thrown.",
+                "Step 2 - Failure: \"Method_Info_From_DoWithResult_Is_Correct\" had parameters \"fakeAdd: Faked Automation.Demo.WebDriver.Tests.Interaction.TestFunctions, numA: 1, numB: 2\" Attempt: 2 ; Exception of type 'System.Exception' was thrown."
+            };
+
+            A.CallTo(() => fakeAdd.Add(numA, numB)).Throws<Exception>().Twice();
+
+            interactionsBase.Do(() => fakeAdd.Add(numA, numB));
+
+            reporting.Steps.Should().BeEquivalentTo(myStepList);
+        }
     }
 }
