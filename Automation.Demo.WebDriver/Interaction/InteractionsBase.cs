@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -40,6 +41,9 @@ namespace Automation.Demo.WebDriver.Interaction
             // If action is from Do() then get methodInfo from the encapsulated delegate
             var methodInfo = action.Method.ReturnType.BaseType != null ? GetDelegateInformation(action) : GetDelegateInformation(action.Target.GetType().GetFields()[0].GetValue(action.Target) as Delegate);
             var reportMessage = $"\"{methodInfo.name}\" had parameters \"{methodInfo.parametersList}\"";
+            var attmeptLogs = new List<(string state, string attemptMessage, Exception exception)>();
+
+            var result = default(T);
 
             for (var attempt = 1; attempt <= maxAttemptCount; attempt++)
             {
@@ -49,16 +53,20 @@ namespace Automation.Demo.WebDriver.Interaction
                     {
                         Thread.Sleep((TimeSpan)retryInterval);
                     }
-                    var result = action();
-                    Reporting.ReportSuccess(reportMessage);
-                    return result;
+                    result = action();
+                    attmeptLogs.Add(("success", reportMessage + $" Attempts: {attempt}", null));
                 }
                 catch (Exception e)
                 {
-                    Reporting.ReportFailure(reportMessage + $" Attempt: {attempt}", e);
+                    attmeptLogs.Add(("failure", reportMessage + $" Attempts: {attempt}", e));
                 }
             }
-            return default(T);
+
+            if (attmeptLogs.Any(l => l.state == "success")) 
+                Reporting.ReportSuccess(attmeptLogs.Last().attemptMessage);
+            else Reporting.ReportFailure(attmeptLogs.Last().attemptMessage, attmeptLogs.Last().exception);
+
+            return result;
         }
 
         private static (string name, string parametersList) GetDelegateInformation(Delegate singleAnonymousDelegate)
