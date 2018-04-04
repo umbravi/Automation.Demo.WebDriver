@@ -41,7 +41,7 @@ namespace Automation.Demo.WebDriver.Interaction
             // If action is from Do() then get methodInfo from the encapsulated delegate
             var methodInfo = action.Method.ReturnType.BaseType != null ? GetDelegateInformation(action) : GetDelegateInformation(action.Target.GetType().GetFields()[0].GetValue(action.Target) as Delegate);
             var reportMessage = $"\"{methodInfo.name}\" had parameters \"{methodInfo.parametersList}\"";
-            var attmeptLogs = new List<(string state, string attemptMessage, Exception exception)>();
+            var attmeptLogs = new List<(StepOutcome stepOutcome, string attemptMessage, Exception exception)>();
 
             var result = default(T);
 
@@ -56,16 +56,16 @@ namespace Automation.Demo.WebDriver.Interaction
                         Thread.Sleep((TimeSpan)retryInterval);
                     }
                     result = action();
-                    attmeptLogs.Add(("success", reportMessage + $" Attempts: {attempt}", null));
+                    attmeptLogs.Add((StepOutcome.Success, reportMessage + $" Attempts: {attempt}", null));
                     attemptOutcome = StepOutcome.Success;
                 }
                 catch (Exception e)
                 {
-                    attmeptLogs.Add(("failure", reportMessage + $" Attempts: {attempt}", e));
+                    attmeptLogs.Add((StepOutcome.Failure, reportMessage + $" Attempts: {attempt}", e));
                 }
             }
 
-            if (attmeptLogs.Any(l => l.state == "success")) 
+            if (attmeptLogs.Any(l => l.stepOutcome == StepOutcome.Success)) 
                 Reporting.ReportSuccess(attmeptLogs.Last().attemptMessage);
             else Reporting.ReportFailure(attmeptLogs.Last().attemptMessage, attmeptLogs.Last().exception);
 
