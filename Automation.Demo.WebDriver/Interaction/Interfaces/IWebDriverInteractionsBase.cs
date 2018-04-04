@@ -8,11 +8,11 @@ namespace Automation.Demo.WebDriver.Interaction.Interfaces
         IPedanticReporting Reporting { get; set; }
 
         void Do(Action action,
-            TimeSpan? retryInterval,
-            int maxAttemptCount);
+            int maxAttemptCount,
+            TimeSpan? retryInterval);
 
         T DoWithResult<T>(Func<T> action,
-            TimeSpan? retryInterval,
-            int maxAttemptCount);
+            int maxAttemptCount,
+            TimeSpan? retryInterval);
     }
 }

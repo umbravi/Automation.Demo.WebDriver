@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Automation.Demo.WebDriver.Interaction.Interfaces;
+using Automation.Demo.WebDriver.Types;
 using Automation.Demo.WebDriver.Utilities.Interfaces;
 
 namespace Automation.Demo.WebDriver.Interaction
@@ -18,23 +19,22 @@ namespace Automation.Demo.WebDriver.Interaction
         }
 
         public void Do(
-            Action action, 
-            TimeSpan? retryInterval = null, 
-            int maxAttemptCount = 2)
+            Action action,
+            int maxAttemptCount = 2,
+            TimeSpan? retryInterval = null)
         {
             // Encapsulate action delegate within a Func delegate with null return type
             DoWithResult<object>(() =>
                 {
                     action();
                     return null;
-                }, retryInterval ?? TimeSpan.FromSeconds(1), maxAttemptCount
-            );
+                }, maxAttemptCount, retryInterval ?? TimeSpan.FromSeconds(1));
         }
 
         public T DoWithResult<T>(
             Func<T> action,
-            TimeSpan? retryInterval = null,
-            int maxAttemptCount = 2)
+            int maxAttemptCount = 2,
+            TimeSpan? retryInterval = null)
         {
             retryInterval = retryInterval ?? TimeSpan.FromSeconds(1);
             
@@ -45,7 +45,9 @@ namespace Automation.Demo.WebDriver.Interaction
 
             var result = default(T);
 
-            for (var attempt = 1; attempt <= maxAttemptCount; attempt++)
+            var attemptOutcome = StepOutcome.Failure;
+
+            for (var attempt = 1; (attemptOutcome == StepOutcome.Success || attempt > maxAttemptCount) == false ; attempt++)
             {
                 try
                 {
@@ -55,6 +57,7 @@ namespace Automation.Demo.WebDriver.Interaction
                     }
                     result = action();
                     attmeptLogs.Add(("success", reportMessage + $" Attempts: {attempt}", null));
+                    attemptOutcome = StepOutcome.Success;
                 }
                 catch (Exception e)
                 {

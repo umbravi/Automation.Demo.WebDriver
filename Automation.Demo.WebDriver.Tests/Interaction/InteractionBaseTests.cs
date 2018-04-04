@@ -138,9 +138,9 @@ namespace Automation.Demo.WebDriver.Tests.Interaction
             var fakeAdd = A.Fake<TestFunctions>();
             var delegateTargetName = MethodBase.GetCurrentMethod().Name;
 
-            A.CallTo(() => fakeAdd.Add(numA, numB)).Throws<Exception>().Once();
+            A.CallTo(() => fakeAdd.AddWithReturn(numA, numB)).Throws<Exception>().Once();
 
-            interactionsBase.Do(() => fakeAdd.Add(numA, numB));
+            interactionsBase.DoWithResult(() => fakeAdd.AddWithReturn(numA, numB));
 
             reporting.Steps.ToList().ForEach(s => s.Should().Contain(delegateTargetName));
         }
@@ -153,11 +153,39 @@ namespace Automation.Demo.WebDriver.Tests.Interaction
             var fakeAdd = A.Fake<TestFunctions>();
             var delegateTargetName = MethodBase.GetCurrentMethod().Name;
 
-            A.CallTo(() => fakeAdd.Add(numA, numB)).Throws<Exception>().Twice();
+            A.CallTo(() => fakeAdd.AddWithReturn(numA, numB)).Throws<Exception>().Twice();
 
-            interactionsBase.Do(() => fakeAdd.Add(numA, numB));
+            interactionsBase.DoWithResult(() => fakeAdd.AddWithReturn(numA, numB));
 
             reporting.Steps.ToList().ForEach(s => s.Should().Contain(delegateTargetName));
+        }
+
+        [TestMethod]
+        public void Successful_Invocation_Of_Delegate_Exits_Loop()
+        {
+            var numA = 1;
+            var numB = 2;
+            var fakeAdd = A.Fake<TestFunctions>();
+
+            interactionsBase.DoWithResult(() => fakeAdd.AddWithReturn(numA, numB));
+
+            A.CallTo(() => fakeAdd.AddWithReturn(numA, numB)).MustHaveHappened(Repeated.Exactly.Once);
+            reporting.Steps.ToList().Last().Should().Contain("Attempts: 1");
+        }
+
+        [TestMethod]
+        public void Success_After_Failure_Exits_Loop()
+        {
+            var numA = 1;
+            var numB = 2;
+            var fakeAdd = A.Fake<TestFunctions>();
+
+            A.CallTo(() => fakeAdd.AddWithReturn(numA, numB)).Throws<Exception>().Once();
+
+            interactionsBase.DoWithResult(() => fakeAdd.AddWithReturn(numA, numB), 3);
+
+            A.CallTo(() => fakeAdd.AddWithReturn(numA, numB)).MustHaveHappened(Repeated.Exactly.Twice);
+            reporting.Steps.ToList().Last().Should().Contain("Attempts: 2");
         }
     }
 }
