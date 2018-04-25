@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Automation.Demo.WebDriver.Interaction.Interfaces;
 using Automation.Demo.WebDriver.Types;
 using Automation.Demo.WebDriver.Utilities.Interfaces;
+using OpenQA.Selenium.Internal;
 
 namespace Automation.Demo.WebDriver.Interaction
 {
@@ -25,10 +27,10 @@ namespace Automation.Demo.WebDriver.Interaction
         {
             // Encapsulate action delegate within a Func delegate with null return type
             DoWithResult<object>(() =>
-                {
-                    action();
-                    return null;
-                }, retryInterval ?? TimeSpan.FromSeconds(1), maxAttemptCount);
+            {
+                action();
+                return null;
+            }, retryInterval, maxAttemptCount);
         }
 
         public T DoWithResult<T>(
@@ -37,39 +39,44 @@ namespace Automation.Demo.WebDriver.Interaction
             int maxAttemptCount = 2)
         {
             retryInterval = retryInterval ?? TimeSpan.FromSeconds(1);
-            
+
             // If action is from Do() then get methodInfo from the encapsulated delegate
             var methodInfo = action.Method.ReturnType.BaseType != null ? GetDelegateInformation(action) : GetDelegateInformation(action.Target.GetType().GetFields()[0].GetValue(action.Target) as Delegate);
             var reportMessage = $"\"{methodInfo.name}\" had parameters \"{methodInfo.parametersList}\"";
-            var attmeptLogs = new List<(StepOutcome stepOutcome, string attemptMessage, Exception exception)>();
 
-            var result = default(T);
+            var processedAction = ProcessAction(action, reportMessage, (TimeSpan)retryInterval, maxAttemptCount);
 
-            var attemptOutcome = StepOutcome.Failure;
+            if (processedAction.stepOutcome == StepOutcome.Success)
+                Reporting.ReportSuccess(processedAction.actionReport);
+            else Reporting.ReportFailure(processedAction.actionReport, processedAction.exception);
 
-            for (var attempt = 1; (attemptOutcome == StepOutcome.Success || attempt > maxAttemptCount) == false ; attempt++)
+            return processedAction.result;
+        }
+
+        private (T result, StepOutcome stepOutcome, string actionReport, Exception exception) ProcessAction<T>(
+            Func<T> action,
+            string reportMessage,
+            TimeSpan retryInterval,
+            int maxAttempts = 2,
+            int attempt = 1)
+        {
+            const int recursionMaxDepth = 5; //can configure in future if needed
+            Exception actionException;
+            (T result, StepOutcome stepOutcome, string actionReport, Exception exception) processedAction;
+            try
             {
-                try
-                {
-                    if (attempt > 1)
-                    {
-                        Thread.Sleep((TimeSpan)retryInterval);
-                    }
-                    result = action();
-                    attmeptLogs.Add((StepOutcome.Success, reportMessage + $" Attempts: {attempt}", null));
-                    attemptOutcome = StepOutcome.Success;
-                }
-                catch (Exception e)
-                {
-                    attmeptLogs.Add((StepOutcome.Failure, reportMessage + $" Attempts: {attempt}", e));
-                }
+                if (attempt > maxAttempts || attempt > recursionMaxDepth) { return (default(T), StepOutcome.Failure, reportMessage + $" Attempts: {Math.Min(attempt, recursionMaxDepth)}", new Exception("Max attempts exceeded.")); }
+                if (attempt > 1) { Thread.Sleep(retryInterval); }
+
+                var result = action();
+                return (result, StepOutcome.Success, reportMessage + $" Attempts: {attempt}", null);
             }
-
-            if (attmeptLogs.Any(l => l.stepOutcome == StepOutcome.Success)) 
-                Reporting.ReportSuccess(attmeptLogs.Last().attemptMessage);
-            else Reporting.ReportFailure(attmeptLogs.Last().attemptMessage, attmeptLogs.Last().exception);
-
-            return result;
+            catch (Exception e)
+            {
+                actionException = e;
+                processedAction = ProcessAction(action, reportMessage, retryInterval, maxAttempts, attempt + 1);
+            }
+            return (processedAction.result, processedAction.stepOutcome, processedAction.actionReport, new Exception(actionException.Message, processedAction.exception));
         }
 
         private static (string name, string parametersList) GetDelegateInformation(Delegate singleAnonymousDelegate)

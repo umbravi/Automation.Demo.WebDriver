@@ -30,7 +30,7 @@ namespace Automation.Demo.WebDriver.Tests.Interaction
         }
 
         [TestMethod]
-        public void Can_Evoke_Action_Delegate()
+        public void Can_EvokeActionDelegate()
         {
             var numA = 1;
             var numB = 2;
@@ -41,7 +41,7 @@ namespace Automation.Demo.WebDriver.Tests.Interaction
         }
 
         [TestMethod]
-        public void Can_Evoke_Func_Delegate()
+        public void Can_EvokeFuncDelegate()
         {
             var numA = 1;
             var numB = 2;
@@ -52,7 +52,7 @@ namespace Automation.Demo.WebDriver.Tests.Interaction
         }
 
         [TestMethod]
-        public void DoWithResult_Retries_Failed_Step()
+        public void DoWithResult_RetriesFailedStep()
         {
             var numA = 1;
             var numB = 2;
@@ -69,7 +69,7 @@ namespace Automation.Demo.WebDriver.Tests.Interaction
         }
 
         [TestMethod]
-        public void DoWithResult_Returns_Default_When_All_Steps_Fail()
+        public void DoWithResult_ReturnsDefault_WhenAllStepsFail()
         {
             var numA = 1;
             var numB = 2;
@@ -101,7 +101,7 @@ namespace Automation.Demo.WebDriver.Tests.Interaction
         }
 
         [TestMethod]
-        public void Method_Info_From_Do_To_DoWithResult_Is_Preserved_In_Success()
+        public void MethodInfoFromDoToDoWithResult_IsPreservedInSuccess()
         {
             var numA = 1;
             var numB = 2;
@@ -116,7 +116,7 @@ namespace Automation.Demo.WebDriver.Tests.Interaction
         }
 
         [TestMethod]
-        public void Method_Info_From_Do_To_DoWithResult_Is_Preserved_In_Failure()
+        public void MethodInfoFromDoToDoWithResult_IsPreservedInFailure()
         {
             var numA = 1;
             var numB = 2;
@@ -131,7 +131,7 @@ namespace Automation.Demo.WebDriver.Tests.Interaction
         }
 
         [TestMethod]
-        public void Method_Info_From_DoWithResult_Is_Correct_In_Success()
+        public void MethodInfoFromDoWithResult_IsCorrectInSuccess()
         {
             var numA = 1;
             var numB = 2;
@@ -146,7 +146,7 @@ namespace Automation.Demo.WebDriver.Tests.Interaction
         }
 
         [TestMethod]
-        public void Method_Info_From_DoWithResult_Is_Correct_In_Failure()
+        public void MethodInfoFromDoWithResult_IsCorrectInFailure()
         {
             var numA = 1;
             var numB = 2;
@@ -161,7 +161,7 @@ namespace Automation.Demo.WebDriver.Tests.Interaction
         }
 
         [TestMethod]
-        public void Successful_Invocation_Of_Delegate_Exits_Loop()
+        public void SuccessfulInvocationOfDelegate_ExitsRecursion()
         {
             var numA = 1;
             var numB = 2;
@@ -174,7 +174,7 @@ namespace Automation.Demo.WebDriver.Tests.Interaction
         }
 
         [TestMethod]
-        public void Success_After_Failure_Exits_Loop()
+        public void SuccessAfterFailure_ExitsRecursion()
         {
             var numA = 1;
             var numB = 2;
@@ -186,6 +186,20 @@ namespace Automation.Demo.WebDriver.Tests.Interaction
 
             A.CallTo(() => fakeAdd.AddWithReturn(numA, numB)).MustHaveHappened(Repeated.Exactly.Twice);
             reporting.Steps.ToList().Last().Should().Contain("Attempts: 2");
+        }
+        [TestMethod]
+        public void RecursionLimitOfFive_IsObeyed()
+        {
+            var numA = 1;
+            var numB = 2;
+            var fakeAdd = A.Fake<TestFunctions>();
+
+            A.CallTo(() => fakeAdd.AddWithReturn(numA, numB)).Throws<Exception>().NumberOfTimes(10);
+
+            interactionsBase.DoWithResult(() => fakeAdd.AddWithReturn(numA, numB), maxAttemptCount: 6);
+
+            A.CallTo(() => fakeAdd.AddWithReturn(numA, numB)).MustHaveHappened(Repeated.Exactly.Times(5));
+            reporting.Steps.ToList().Last().Should().Contain("Attempts: 5");
         }
     }
 }
