@@ -20,21 +20,21 @@ namespace Automation.Demo.WebDriver.Interaction
 
         public void Do(
             Action action,
-            int maxAttemptCount = 2,
-            TimeSpan? retryInterval = null)
+            TimeSpan? retryInterval = null,
+            int maxAttemptCount = 2)
         {
             // Encapsulate action delegate within a Func delegate with null return type
             DoWithResult<object>(() =>
                 {
                     action();
                     return null;
-                }, maxAttemptCount, retryInterval ?? TimeSpan.FromSeconds(1));
+                }, retryInterval ?? TimeSpan.FromSeconds(1), maxAttemptCount);
         }
 
         public T DoWithResult<T>(
             Func<T> action,
-            int maxAttemptCount = 2,
-            TimeSpan? retryInterval = null)
+            TimeSpan? retryInterval = null,
+            int maxAttemptCount = 2)
         {
             retryInterval = retryInterval ?? TimeSpan.FromSeconds(1);
             

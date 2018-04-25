@@ -14,7 +14,7 @@ namespace Automation.Demo.WebDriver.Tests.Interaction.SeleniumWebDriver.Selenium
 
             var expectedElement = fakeActions.GetSelectElement(fakeElement);
 
-            expectedElement.ShouldBeEquivalentTo(fakeSelectElement);
+            expectedElement.Should().BeEquivalentTo(fakeSelectElement);
         }
     }
 }

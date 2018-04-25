@@ -34,10 +34,10 @@ namespace Automation.Demo.WebDriver.Tests.Utilities
             Expression<Action> sucessStep = () => fakePedanticReporting.LogStepReport(StepOutcome.Success, stepTaken);
             fakePedanticReporting.ReportSuccess(stepTaken);
 
-            fakePedanticReporting.Steps.Count.ShouldBeEquivalentTo(1);
+            fakePedanticReporting.Steps.Count.Should().Be(1);
             var expectedText = "Step 1 - Success: I'm a step that was taken";
             fakePedanticReporting.Steps[0].Should().BeEquivalentTo(expectedText);
-            fakePedanticReporting.Exceptions.Count.ShouldBeEquivalentTo(0);
+            fakePedanticReporting.Exceptions.Count.Should().Be(0);
         }
 
         [TestMethod]
@@ -49,10 +49,10 @@ namespace Automation.Demo.WebDriver.Tests.Utilities
             Expression<Action> sucessStep = () => fakePedanticReporting.LogStepReport(StepOutcome.Success, stepTaken);
             fakePedanticReporting.ReportFailure(stepTaken, exception);
 
-            fakePedanticReporting.Steps.Count.ShouldBeEquivalentTo(1);
+            fakePedanticReporting.Steps.Count.Should().Be(1);
             var expectedText = $"Step 1 - Failure: {stepTaken} ; {exception.Message}";
             fakePedanticReporting.Steps[0].Should().BeEquivalentTo(expectedText);
-            fakePedanticReporting.Exceptions.Count.ShouldBeEquivalentTo(1);
+            fakePedanticReporting.Exceptions.Count.Should().Be(1);
         }
     }
 }

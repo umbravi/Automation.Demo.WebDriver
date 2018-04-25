@@ -48,7 +48,7 @@ namespace Automation.Demo.WebDriver.Tests.Interaction
 
             var sum = interactionsBase.DoWithResult(() => new TestFunctions().AddWithReturn(numA, numB));
 
-            sum.ShouldBeEquivalentTo(3);
+            sum.Should().Be(3);
         }
 
         [TestMethod]
@@ -182,7 +182,7 @@ namespace Automation.Demo.WebDriver.Tests.Interaction
 
             A.CallTo(() => fakeAdd.AddWithReturn(numA, numB)).Throws<Exception>().Once();
 
-            interactionsBase.DoWithResult(() => fakeAdd.AddWithReturn(numA, numB), 3);
+            interactionsBase.DoWithResult(() => fakeAdd.AddWithReturn(numA, numB), maxAttemptCount: 3);
 
             A.CallTo(() => fakeAdd.AddWithReturn(numA, numB)).MustHaveHappened(Repeated.Exactly.Twice);
             reporting.Steps.ToList().Last().Should().Contain("Attempts: 2");

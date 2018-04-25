@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using Automation.Demo.WebDriver.Interaction.Interfaces;
 using Automation.Demo.WebDriver.Types;
 using FakeItEasy;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 
@@ -134,7 +136,27 @@ namespace Automation.Demo.WebDriver.Tests.Interaction.SeleniumWebDriver.Selenium
         [TestMethod]
         public void Selenium_ValidateTextDisplayedOnPage()
         {
-            var elementText = "element text";
+            var elementText = "text";
+
+            var elementList = new List<IWebElement> { fakeElement };
+
+            var elementReadOnlyCollection = new ReadOnlyCollection<IWebElement>(elementList);
+
+            var myBy = By.XPath($"//*[contains(text(),'{elementText}')]");
+
+            Expression<Func<IReadOnlyCollection<IWebElement>>> findElements = () => fakeSeleniumDriver.FindElements(myBy);
+
+            A.CallTo(findElements).Returns(elementReadOnlyCollection);
+
+            fakeValidations.ValidateTextDisplayedOnPage("text");
+
+            A.CallTo(findElements).MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [TestMethod]
+        public void Selenium_ValidateTextDisplayedOnPage_ThrowsSeleniumValidationException()
+        {
+            var elementText = "element";
 
             var elementList = new List<IWebElement> { fakeElement };
 
@@ -144,22 +166,10 @@ namespace Automation.Demo.WebDriver.Tests.Interaction.SeleniumWebDriver.Selenium
 
             A.CallTo(findElements).Returns(elementList);
 
-            fakeValidations.ValidateTextDisplayedOnPage("text");
+            Action act = () => fakeValidations.ValidateTextDisplayedOnPage("text");
 
-            A.CallTo(findElements).MustHaveHappened(Repeated.Exactly.Once);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(SeleniumValidationException), "Expected uri not present: Expected Contains: \"exception/text\" - Actual: \"uri/text\"")]
-        public void Selenium_ValidateTextDisplayedOnPage_ThrowsSeleniumValidationException()
-        {
-            Expression<Func<string>> getUrl = () => fakeSeleniumDriver.Url;
-
-            A.CallTo(getUrl).Returns("uri/text");
-
-            fakeValidations.ValidateUrlContainsUri("exception/text");
-
-            A.CallTo(getUrl).MustHaveHappened(Repeated.Exactly.Once);
+            act.Should().Throw<SeleniumValidationException>()
+                .WithMessage($"Expected text not displayed on page - Expected: \"text\"");
         }
     }
 }
